@@ -1,5 +1,5 @@
 #Event Logs Send to Email Script
-#Version:1.0 June 2018
+#Version:1.0, June 2018, James Pearman
 
 #Parameters
 $ServerName = "$env:computername"
