@@ -1,0 +1,3 @@
+Link to PS2EXE-GUI to convert PS1 to EXE
+
+https://gallery.technet.microsoft.com/scriptcenter/PS2EXE-GUI-Convert-e7cb69d5#content
