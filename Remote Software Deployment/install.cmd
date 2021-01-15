@@ -1,0 +1,1 @@
+setup.exe /s /V"/qn INSTALLDIR=\"C:\BSX\APPLICS\" ACCEPTEULA=\"Yes\" HOSTNAME=\"192.168.5.245\""
