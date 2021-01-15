@@ -1,0 +1,10 @@
+list
+the
+full
+hostname
+of
+computers
+down
+here
+
+For example: computer.domain.com
