@@ -1,0 +1,2 @@
+\\SHARE\FOLDER\Install.cmd
+\\SHARE\FOLDER\Setup.exe
