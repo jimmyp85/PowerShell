@@ -1,5 +1,5 @@
 # DFSR Backlog Monitoring Script
-# Version: 1.0, October 2020, James Pearman
+# Version: 1.0, October 2020
 
 
 
