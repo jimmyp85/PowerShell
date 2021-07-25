@@ -20,7 +20,8 @@ $Style = $Style + "</style>"
 $Pre = "Application and System event logs with either warning or error status for $ServerName within last 24 hours"
 
 #Get event logs and convert to HTML file
-$Events = Get-WinEvent -FilterHashTable @{LogName='Application','System'; Level=2,3; StartTime=$Yesterday} -ErrorAction SilentlyContinue | Select-Object TimeCreated,LogName,ProviderName,Id,LevelDisplayName,Message
+$Events = Get-WinEvent -FilterHashTable @{LogName='Application','System'; Level=2,3; StartTime=$Yesterday} -ErrorAction SilentlyContinue | 
+Select-Object TimeCreated,LogName,ProviderName,Id,LevelDisplayName,Message
 
 $Events | ConvertTo-HTML -Head $Style -PreContent $Pre > "$ReportFileName"
 
