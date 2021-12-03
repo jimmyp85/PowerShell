@@ -1,11 +1,11 @@
 
 <#
-Iris Brokasure Launcher 
+Brokasure Launcher 
 Version 2
 J Pearman, June 2021
 
 Description:
-This is the initial version of a launcher for Brokasure created for users of both the normal dataset and Iris France dataset. Using these datasets from this tool willensure that the correct electronic forms settings are in place and that generated documents using the correct templates.
+This is the initial version of a launcher for Brokasure created for users of both the normal dataset and EU dataset. Using these datasets from this tool will ensure that the correct electronic forms settings are in place and that generated documents using the correct templates.
 
 #>
 
@@ -15,13 +15,13 @@ This is the initial version of a launcher for Brokasure created for users of bot
 
 function BSLive{
     
-    start-Process powershell -WorkingDirectory \\fs01\brokasure\Launcher\BatFiles {Start-Process IrisBS.bat}
+    start-Process powershell -WorkingDirectory "\\SERVER\SHARE\BatFiles" {Start-Process BS.bat}
 
 }
 
 function BSFrance{
 
-    start-Process powershell -WorkingDirectory \\fs01\brokasure\Launcher\BatFiles {Start-Process IrisFrance.bat}
+    start-Process powershell -WorkingDirectory "\\SERVER\SHARE\BatFiles" {Start-Process France.bat}
 
 }
 
