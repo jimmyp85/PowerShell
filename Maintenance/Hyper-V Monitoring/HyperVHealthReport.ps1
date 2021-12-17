@@ -62,7 +62,7 @@ Select @{Name="Operating System";Expression={$_.OsName}},
 @{Name="MemGB";Expression={$_.CsTotalPhysicalMemory/1GB -as [int]}},
 @{Name="Serial Number";Expression={$_.BiosSeralNumber}} | 
 
-ConvertTo-Html -PreContent "OS and Hardware information" -Fragment
+ConvertTo-Html -PreContent "<h1>OS and Hardware information</h1>" -Fragment
 
 
 # RAM Details
@@ -77,7 +77,7 @@ Select @{Name="Total Memory GB";Expression={$_.OsTotalVisibleMemorySize/1024/102
 @{Name="Page File Free GB";Expression={$_.OsFreeSpaceInPagingFiles/1024/1024 -as [int]}},
 @{Name="Page Files";Expression={$_.OsPagingFiles}} | 
 
-ConvertTo-Html -PreContent "Memory Details" -Fragment
+ConvertTo-Html -PreContent "<h1>Memory Details</h1>" -Fragment
 
 # Host HDD info
 
@@ -90,7 +90,7 @@ Select @{Name="Drive";Expression={$_.DriveLetter}},
 @{Name="Volume Size";Expression={$_.Size/1GB -as [int]}},
 @{Name="Volume Free Space";Expression={$_.SizeRemaining/1GB -as [int]}} | 
 
-ConvertTo-Html -PreContent "Host Hard Drive Information" -Fragment
+ConvertTo-Html -PreContent "<h1>Host Hard Drive Information</h1>" -Fragment
 
 # Hyper-V Services
 
@@ -98,7 +98,7 @@ $HVServices = Get-Service HvHost, vmickvpexchange, vmicguestinterface, vmicshutd
 Select @{Name="Name";Expression={$_.DisplayName}},
 @{Name="Status";Expression={$_.Status}} | 
 
-ConvertTo-Html -PreContent "Hyper-V Services" -Fragment
+ConvertTo-Html -PreContent "<h1>Hyper-V Services</h1>" -Fragment
 
 # Hyper-V VM Switch Infomation
 
@@ -108,7 +108,7 @@ Select @{Name="Name";Expression={$_.Name}},
 @{Name="Switch Type";Expression={$_.SwitchType}},
 @{Name="Allow Management OS";Expression={$_.AllowManagementOS}} | 
 
-ConvertTo-Html -PreContent "Virtual Switch Information" -Fragment
+ConvertTo-Html -PreContent "<h1>Virtual Switch Information</h1>" -Fragment
 
 # Virtual Machine Information
 
@@ -127,7 +127,7 @@ Select @{Name="Name";Expression={$_.VMName}},
 @{Name="Version";Expression={$_.Version}},
 @{Name="Virtual Machine Type";Expression={$_.VirtualMachineSubType}} | 
 
-ConvertTo-Html -PreContent "Virtual Machines" -Fragment
+ConvertTo-Html -PreContent "<h1>Virtual Machines</h1>" -Fragment
 
 # Virtual Machine Drive Information
 
@@ -135,7 +135,7 @@ $VMHDD = Get-VM -ErrorAction SilentlyContinue | Get-VMHardDiskDrive | Select-Obj
 Select @{Name="Virtual Machine";Expression={$_.VMName}},
 @{Name="VHDX Path";Expression={$_.Path}} | 
 
-ConvertTo-Html -PreContent "Virtual Machine Drives" -Fragment
+ConvertTo-Html -PreContent "<h1>Virtual Machine Drives</h1>" -Fragment
 
 # Detailed VHDX Information
 
@@ -146,7 +146,7 @@ Select @{Name="VHDX Location";Expression={$_.Path}},
 @{Name="Disk Size GB";Expression={$_.Size/1GB -as [int]}},
 @{Name="Attached";Expression={$_.Attached}} | 
 
-ConvertTo-Html -PreContent "VHDX Information" -Fragment
+ConvertTo-Html -PreContent "<h1>VHDX Information</h1>" -Fragment
 
 # VM Network Adapters 
 
@@ -157,7 +157,7 @@ Select @{Name="Server Name";Expression={$_.VMName}},
 @{Name="Status";Expression={$_.Status}},
 @{Name="Connected";Expression={$_.Connected}} | 
 
-ConvertTo-Html -PreContent "VM Network Adapters" -Fragment
+ConvertTo-Html -PreContent "<h1>VM Network Adapters</h1>" -Fragment
 
 # Hyper-V Events
 
@@ -168,7 +168,7 @@ Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
 @{Name="Event ID";Expression={$_.InstanceId}},
 @{Name="Server";Expression={$_.MachineName}} | 
 
-ConvertTo-Html -PreContent "System Events" -Fragment
+ConvertTo-Html -PreContent "<h1>System Events</h1>" -Fragment
 
 $AppLogs = Get-EventLog -LogName Application -EntryType Error, Warning -After (Get-Date).AddHours(-24) -ErrorAction SilentlyContinue |
 Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
@@ -177,7 +177,7 @@ Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
 @{Name="Event ID";Expression={$_.InstanceId}},
 @{Name="Server";Expression={$_.MachineName}} | 
 
-ConvertTo-Html -PreContent "Application Events" -Fragment
+ConvertTo-Html -PreContent "<h1>Application Events</h1>" -Fragment
 
 # Create HTML Report
 
