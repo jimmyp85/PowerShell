@@ -1,5 +1,5 @@
 # Hyper-V Monitoring Script
-Jpearman, January 2022, Version 2
+J Pearman, January 2022, Version 2
 
 ## Purpose
 This script has been written to provide basic monitoring and auditing of Hyper-V hypervisors and the virtual machines they are running.
