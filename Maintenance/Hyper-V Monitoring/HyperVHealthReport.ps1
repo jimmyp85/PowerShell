@@ -1,55 +1,49 @@
 <#
 Hyper-V Health Report
-J Pearman, December 2021, Version 1
+J Pearman, January 2022, Version 2
 
-Description
+Description:
 This script looks up information on the hyper-v host and virtual machines and then emails this to an address you enter below.
 
+Change Log:
+Version 1 -		Initial Script
+Version 2 -		Changed test order
+			Changed HTML Table to make it clearer
+			Added Green/Red colours for test results
+	
 #>
 
 
 # Parameters
 
-$EmailTo  = "ENTER RECPT"
-$EmailFrom = "ENTER SENDER"
+$EmailTo  = "jdoe@domainad.com"
+$EmailFrom = "host01@domain.com"
 $EmailSubject = "Hyper-V Daily Status Report for " + $ServerName
-$SMTP = "ENTER SMTP SVR"
-$ServerName = "$env:computername"
-$ReportFileName = "ENTER FILE PATH\HyperVRpt.html"
-$Attachment = "ENTER FILE PATH\HyperVRpt.html"
+$SMTP = "smtp.domain.com"
+$ServerName = $env:computername
+$ReportFileName = "C:\HyperVRpt.html"
+$Attachment = "C:\HyperVRpt.html"
 
 
 # HTML Table
 $Table = @"
+
 <style>
-
-Table {
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
-	border-collapse: collapse;
-    
-}
-
-TH {
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
-	background-color: #BDBDBD;
-}
-
-TD {
-	border-width: 1px;
-	padding: 4px;
-	border-style: solid;
-	border-color: black;
-}
-
+    TABLE{border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}
+    TH{border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color:#c2d1f0}
+    TD{border-width: 1px;padding: 3px;border-style: solid;border-color: black;}
+    tr:nth-child(odd) { background-color:#e6e6e6;} 
+    tr:nth-child(even) { background-color:white;}    
 </style>
 
 "@
 
-# OS and Hardware information
+#Cell Color - Logic
+
+$StatusColor = @{False = ' bgcolor="#FE2E2E">False<';True = ' bgcolor="#58FA58">True<';Stopped = ' bgcolor="#FE2E2E">Stopped<';Unknown = ' bgcolor="#FE2E2E">Unknown<';Running = ' bgcolor="#58FA58">Running<';Failed = ' bgcolor="#FE2E2E">Failed<';Passed = ' bgcolor="#58FA58">Passed<';OK = ' bgcolor="#58FA58">OK<';}
+
+
+# OS and Hardware information - 1
 
 $HostOSHW = Get-ComputerInfo -ErrorAction SilentlyContinue |
 Select @{Name="Operating System";Expression={$_.OsName}},
@@ -62,24 +56,21 @@ Select @{Name="Operating System";Expression={$_.OsName}},
 @{Name="MemGB";Expression={$_.CsTotalPhysicalMemory/1GB -as [int]}},
 @{Name="Serial Number";Expression={$_.BiosSeralNumber}} | 
 
-ConvertTo-Html -PreContent "<h1>OS and Hardware information</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>OS and Hardware information</h2>" -Fragment
 
+# Hyper-V Services - 2
 
-# RAM Details
+$HVServices = Get-Service HvHost, vmickvpexchange, vmicguestinterface, vmicshutdown, vmicheartbeat, vmcompute, vmicvmsession, vmicrdv, vmictimesync, vmms, vmicvss |
+Select @{Name="Name";Expression={$_.DisplayName}},
+@{Name="Status";Expression={$_.Status}} | 
 
-$HostRAM = Get-ComputerInfo -ErrorAction SilentlyContinue |
-Select @{Name="Total Memory GB";Expression={$_.OsTotalVisibleMemorySize/1024/1024 -as [int]}},
-@{Name="Free Memory GB";Expression={$_.OsFreePhysicalMemory/1024/1024 -as [int]}},
-@{Name="Total Virtual Memory GB";Expression={$_.OsTotalVirtualMemorySize/1024/1024 -as [int]}},
-@{Name="Free Virtual Memory GB";Expression={$_.OsFreeVirtualMemory/1024/1024 -as [int]}},
-@{Name="Virtual Memory In Use GB";Expression={$_.OsInUseVirtualMemory/1024/1024 -as [int]}},
-@{Name="Stored in Page File GB";Expression={$_.OsSizeStoredInPagingFiles/1024/1024 -as [int]}},
-@{Name="Page File Free GB";Expression={$_.OsFreeSpaceInPagingFiles/1024/1024 -as [int]}},
-@{Name="Page Files";Expression={$_.OsPagingFiles}} | 
+ConvertTo-Html -PreContent "<h2>Hyper-V Services</h2>" -Fragment
 
-ConvertTo-Html -PreContent "<h1>Memory Details</h1>" -Fragment
+    # Cell Color - Find\Replace
 
-# Host HDD info
+$StatusColor.Keys | foreach { $HVServices = $HVServices -replace ">$_<",($StatusColor.$_) }
+
+# Host HDD info - 3
 
 $HostHDD = Get-Volume -ErrorAction SilentlyContinue |
 Select @{Name="Drive";Expression={$_.DriveLetter}},
@@ -90,27 +81,13 @@ Select @{Name="Drive";Expression={$_.DriveLetter}},
 @{Name="Volume Size";Expression={$_.Size/1GB -as [int]}},
 @{Name="Volume Free Space";Expression={$_.SizeRemaining/1GB -as [int]}} | 
 
-ConvertTo-Html -PreContent "<h1>Host Hard Drive Information</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>Host Hard Drive Information</h2>" -Fragment
 
-# Hyper-V Services
+    # Cell Color - Find\Replace
 
-$HVServices = Get-Service HvHost, vmickvpexchange, vmicguestinterface, vmicshutdown, vmicheartbeat, vmcompute, vmicvmsession, vmicrdv, vmictimesync, vmms, vmicvss |
-Select @{Name="Name";Expression={$_.DisplayName}},
-@{Name="Status";Expression={$_.Status}} | 
+$StatusColor.Keys | foreach { $HostHDD = $HostHDD -replace ">$_<",($StatusColor.$_) }
 
-ConvertTo-Html -PreContent "<h1>Hyper-V Services</h1>" -Fragment
-
-# Hyper-V VM Switch Infomation
-
-$VMSwitch = Get-VMSwitch -ErrorAction SilentlyContinue |
-Select @{Name="Name";Expression={$_.Name}},
-@{Name="Network Adapter";Expression={$_.NetAdapterInterfaceDescription}},
-@{Name="Switch Type";Expression={$_.SwitchType}},
-@{Name="Allow Management OS";Expression={$_.AllowManagementOS}} | 
-
-ConvertTo-Html -PreContent "<h1>Virtual Switch Information</h1>" -Fragment
-
-# Virtual Machine Information
+# Virtual Machine Information - 4
 
 $GetVM = Get-VM -ErrorAction SilentlyContinue | Select-Object * |
 Select @{Name="Name";Expression={$_.VMName}},
@@ -127,28 +104,13 @@ Select @{Name="Name";Expression={$_.VMName}},
 @{Name="Version";Expression={$_.Version}},
 @{Name="Virtual Machine Type";Expression={$_.VirtualMachineSubType}} | 
 
-ConvertTo-Html -PreContent "<h1>Virtual Machines</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>Virtual Machines</h2>" -Fragment
 
-# Virtual Machine Drive Information
+    # Cell Color - Find\Replace
 
-$VMHDD = Get-VM -ErrorAction SilentlyContinue | Get-VMHardDiskDrive | Select-Object * |
-Select @{Name="Virtual Machine";Expression={$_.VMName}},
-@{Name="VHDX Path";Expression={$_.Path}} | 
+$StatusColor.Keys | foreach { $GetVM = $GetVM -replace ">$_<",($StatusColor.$_) }
 
-ConvertTo-Html -PreContent "<h1>Virtual Machine Drives</h1>" -Fragment
-
-# Detailed VHDX Information
-
-$VHDX_Info = Get-VM -ErrorAction SilentlyContinue | Select-Object VMId | Get-VHD | select-object * |
-Select @{Name="VHDX Location";Expression={$_.Path}},
-@{Name="Format";Expression={$_.VhdFormat}},
-@{Name="Type";Expression={$_.VhdType}},
-@{Name="Disk Size GB";Expression={$_.Size/1GB -as [int]}},
-@{Name="Attached";Expression={$_.Attached}} | 
-
-ConvertTo-Html -PreContent "<h1>VHDX Information</h1>" -Fragment
-
-# VM Network Adapters 
+# VM Network Adapters - 5
 
 $VMNet = Get-VMNetworkAdapter -VMName * -ErrorAction SilentlyContinue | Select-Object * |
 Select @{Name="Server Name";Expression={$_.VMName}},
@@ -157,9 +119,62 @@ Select @{Name="Server Name";Expression={$_.VMName}},
 @{Name="Status";Expression={$_.Status}},
 @{Name="Connected";Expression={$_.Connected}} | 
 
-ConvertTo-Html -PreContent "<h1>VM Network Adapters</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>VM Network Adapters</h2>" -Fragment
 
-# Hyper-V Events
+    # Cell Color - Find\Replace
+
+$StatusColor.Keys | foreach { $VMNet = $VMNet -replace ">$_<",($StatusColor.$_) }
+
+# Detailed VHDX Information - 6
+
+$VHDX_Info = Get-VM -ErrorAction SilentlyContinue | Select-Object VMId | Get-VHD | select-object * |
+Select @{Name="VHDX Location";Expression={$_.Path}},
+@{Name="Format";Expression={$_.VhdFormat}},
+@{Name="Type";Expression={$_.VhdType}},
+@{Name="Disk Size GB";Expression={$_.Size/1GB -as [int]}},
+@{Name="Attached";Expression={$_.Attached}} | 
+
+ConvertTo-Html -PreContent "<h2>VHDX Information</h2>" -Fragment
+
+    # Cell Color - Find\Replace
+
+$StatusColor.Keys | foreach { $VHDX_Info = $VHDX_Info -replace ">$_<",($StatusColor.$_) }
+
+# Virtual Machine Drive Information - 7
+
+$VMHDD = Get-VM -ErrorAction SilentlyContinue | Get-VMHardDiskDrive | Select-Object * |
+Select @{Name="Virtual Machine";Expression={$_.VMName}},
+@{Name="VHDX Path";Expression={$_.Path}} | 
+
+ConvertTo-Html -PreContent "<h2>Virtual Machine Drives</h2>" -Fragment
+
+
+# Hyper-V VM Switch Infomation - 8
+
+$VMSwitch = Get-VMSwitch -ErrorAction SilentlyContinue |
+Select @{Name="Name";Expression={$_.Name}},
+@{Name="Network Adapter";Expression={$_.NetAdapterInterfaceDescription}},
+@{Name="Switch Type";Expression={$_.SwitchType}},
+@{Name="Allow Management OS";Expression={$_.AllowManagementOS}} | 
+
+ConvertTo-Html -PreContent "<h2>Virtual Switch Information</h2>" -Fragment
+
+
+# RAM Details - 9
+
+$HostRAM = Get-ComputerInfo -ErrorAction SilentlyContinue |
+Select @{Name="Total Memory GB";Expression={$_.OsTotalVisibleMemorySize/1024/1024 -as [int]}},
+@{Name="Free Memory GB";Expression={$_.OsFreePhysicalMemory/1024/1024 -as [int]}},
+@{Name="Total Virtual Memory GB";Expression={$_.OsTotalVirtualMemorySize/1024/1024 -as [int]}},
+@{Name="Free Virtual Memory GB";Expression={$_.OsFreeVirtualMemory/1024/1024 -as [int]}},
+@{Name="Virtual Memory In Use GB";Expression={$_.OsInUseVirtualMemory/1024/1024 -as [int]}},
+@{Name="Stored in Page File GB";Expression={$_.OsSizeStoredInPagingFiles/1024/1024 -as [int]}},
+@{Name="Page File Free GB";Expression={$_.OsFreeSpaceInPagingFiles/1024/1024 -as [int]}},
+@{Name="Page Files";Expression={$_.OsPagingFiles}} | 
+
+ConvertTo-Html -PreContent "<h2>Memory Details</h2>" -Fragment
+
+# Hyper-V Events - 10
 
 $SystemLogs = Get-EventLog -LogName System -EntryType Error, Warning -After (Get-Date).AddHours(-24) -ErrorAction SilentlyContinue |
 Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
@@ -168,7 +183,7 @@ Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
 @{Name="Event ID";Expression={$_.InstanceId}},
 @{Name="Server";Expression={$_.MachineName}} | 
 
-ConvertTo-Html -PreContent "<h1>System Events</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>System Events</h2>" -Fragment
 
 $AppLogs = Get-EventLog -LogName Application -EntryType Error, Warning -After (Get-Date).AddHours(-24) -ErrorAction SilentlyContinue |
 Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
@@ -177,11 +192,11 @@ Select @{Name="Time Generated";Expression={$_.TimeGenerated}},
 @{Name="Event ID";Expression={$_.InstanceId}},
 @{Name="Server";Expression={$_.MachineName}} | 
 
-ConvertTo-Html -PreContent "<h1>Application Events</h1>" -Fragment
+ConvertTo-Html -PreContent "<h2>Application Events</h2>" -Fragment
 
 # Create HTML Report
 
-ConvertTo-HTML -Body "$HostOSHW $HostRAM $HostHDD $HVServices $VMSwitch $GetVM $VMHDD $VHDX_Info $VMNet $SystemLog $AppLogs" -Head $Table | Out-File "$ReportFileName"
+ConvertTo-HTML -Body "$HostOSHW $HVServices $HostHDD $GetVM $VMNet $VHDX_Info $VMHDD $VMSwitch $HostRAM $SystemLogs $AppLogs" -Head $Table | Out-File "$ReportFileName"
 
 # Email Report
 
