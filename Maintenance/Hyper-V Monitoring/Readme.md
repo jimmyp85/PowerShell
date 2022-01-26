@@ -15,11 +15,13 @@ This provides information on the following:
 - Host System and Application event logs
 
 ## Change Log
-Version 1 	Initial Script
+#### Version 1 	
+- Initial Script
 
-Version 2 	Changed test order
-			Changed HTML Table to make it clearer
-			Added Green/Red colours for test results
+#### Version 2 	
+- Changed test order
+- Changed HTML Table to make it clearer
+- Added Green/Red colours for test results
 
 ##  Parameters to Change
 The following parameters need to be changed in the script:
