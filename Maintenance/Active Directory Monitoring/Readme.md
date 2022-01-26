@@ -1,5 +1,5 @@
 # Active Directory Monitoring Script
-Version 1, December 2021
+J Pearman, Version 2, January 2022
 
 ## Purpose
 This script has been written to run as a scheduled take and report daily on the general health of your domain controllers.
@@ -49,6 +49,11 @@ This script has been written for two AD sites (as that's what I have and wrote i
 
 Please note: You will need the Active Directory module installed on the machine you run this on. It's better not to run on a DC but rather a seperate PC/Server running the AD module.
 
+## Change Log
+Version 1: Initial version
+Version 2: Changed section header size 
+           Added colours for pass/fail/true/false to make it easier to read at a glance
+           Changed HTML table
 
 ##  Parameters to Change
 The following parameters need to be changed in the script:
