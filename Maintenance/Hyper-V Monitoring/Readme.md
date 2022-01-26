@@ -1,5 +1,5 @@
 # Hyper-V Monitoring Script
-Version 1
+Jpearman, January 2022, Version 2
 
 ## Purpose
 This script has been written to provide basic monitoring and auditing of Hyper-V hypervisors and the virtual machines they are running.
@@ -13,6 +13,13 @@ This provides information on the following:
 - Virtual HDD's
 - Virtual Machine Networking
 - Host System and Application event logs
+
+## Change Log
+Version 1 	Initial Script
+
+Version 2 	Changed test order
+			Changed HTML Table to make it clearer
+			Added Green/Red colours for test results
 
 ##  Parameters to Change
 The following parameters need to be changed in the script:
