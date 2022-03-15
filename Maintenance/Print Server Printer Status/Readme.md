@@ -1,5 +1,5 @@
 # Print Server: Printer Status Report
-Version 2, January 2022, J Pearman
+Version 3, March 2022, J Pearman
 
 ## Purpose
 This script provides basic status information for printers hosted on print servers. It has been written to monitor two print servers but one can be removed or others added depending on your needs.
