@@ -5,10 +5,10 @@ J Pearman, Version 1, April 2022
 This script has been written to export a users logon, logoff, lock and unlock events for the purpose of creating a report showing these events.
 
 The following events are exported:
-    *4624: User Logon (interactive only)
-    *4647: User Logoff
-    *4800: Computer Locked
-    *4801: Computer Unlocked
+* 4624 - User Logon (interactive only)
+* 4647 - User Logoff
+* 4800 - Computer Locked
+* 4801 - Computer Unlocked
 
 Once exported these events are merged into a single CSV file where they can be viewed together.
 
