@@ -23,6 +23,9 @@ This provides information on the following:
 - Changed HTML Table to make it clearer
 - Added Green/Red colours for test results
 
+#### Version 3
+- Added server uptime and last boot date and time.
+
 ##  Parameters to Change
 The following parameters need to be changed in the script:
 
