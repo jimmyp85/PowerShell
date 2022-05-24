@@ -1,23 +1,25 @@
 <#
 Hyper-V Health Report
-J Pearman, January 2022, Version 2
+J Pearman, May 2022, Version 3
 
 Description:
 This script looks up information on the hyper-v host and virtual machines and then emails this to an address you enter below.
 
 Change Log:
 Version 1 -		Initial Script
+
 Version 2 -		Changed test order
 			Changed HTML Table to make it clearer
 			Added Green/Red colours for test results
-	
+
+Version 3 - 		Added server uptime and last boot date
 #>
 
 
 # Parameters
 
 $EmailTo  = "jdoe@domainad.com"
-$EmailFrom = "host01@domain.com"
+$EmailFrom = "host01@irisib.com"
 $EmailSubject = "Hyper-V Daily Status Report for " + $ServerName
 $SMTP = "smtp.domain.com"
 $ServerName = $env:computername
@@ -54,7 +56,9 @@ Select @{Name="Operating System";Expression={$_.OsName}},
 @{Name="Logical Processors";Expression={$_.CsNumberOfLogicalProcessors}},
 @{Name="Physical Processors";Expression={$_.CsNumberOfProcessors}},
 @{Name="MemGB";Expression={$_.CsTotalPhysicalMemory/1GB -as [int]}},
-@{Name="Serial Number";Expression={$_.BiosSeralNumber}} | 
+@{Name="Serial Number";Expression={$_.BiosSeralNumber}},
+@{Name="Server Uptime";Expression={$_.OsUptime.ToString("dd\.hh\:mm\:ss")}},
+@{Name="Last Bootup";Expression={$_.OsLastBootUpTime}} | 
 
 ConvertTo-Html -PreContent "<h2>OS and Hardware information</h2>" -Fragment
 
