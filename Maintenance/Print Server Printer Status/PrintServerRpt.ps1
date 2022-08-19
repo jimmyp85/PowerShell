@@ -1,23 +1,24 @@
 <#
 Print Server: Printer Status Report
-J Pearman, June 2022, Version 4
+J Pearman, August 2022, Version 5
 
 Change Log:
     	V1 - Initial script
-   	V2 - Added colour to True, False, Offline, Online results, Added odd/event row shading   
+    	V2 - Added colour to True, False, Offline, Online results, Added odd/event row shading   
 	V3 - Added colour for TonerLow status.
-	V4 - Added additional states
+    	V4 - Added additional states
+	V5 - Added additional states
 #>
 
 
 
 # Params
-$EmailTo  = "admin@domain.com"
-$EmailFrom = "printers@domain.com"
+$EmailTo  = "itlogs@irisib.com"
+$EmailFrom = "printers@irisib.com"
 $EmailSubject = "Daily Printer Report"
-$SMTP = "smtp.domain.com"
-$ReportFileName = "C:\Printers.html"
-$Attachment = "C:\Printers.html"
+$SMTP = "192.168.5.225"
+$ReportFileName = "C:\TaskScripts\TaskOut\Printers\Printers.html"
+$Attachment = "C:\TaskScripts\TaskOut\Printers\Printers.html"
 
 # HTML Table
 $Style = "
@@ -31,36 +32,36 @@ $Style = "
 "
 
 #Cell Color - Logic
-$StatusColor = @{False = ' bgcolor="#FE2E2E">False<';True = ' bgcolor="#58FA58">True<';Offline = ' bgcolor="#FE2E2E">Offline<';Error = ' bgcolor="#FE2E2E">Offline<';Normal = ' bgcolor="#58FA58">Normal<';PaperOut = ' bgcolor="#FC9704">TonerLow<';TonerLow = ' bgcolor="#FC9704">TonerLow<';}
+$StatusColor = @{False = ' bgcolor="#FE2E2E">False<';True = ' bgcolor="#58FA58">True<';Offline = ' bgcolor="#FE2E2E">Offline<';Error = ' bgcolor="#FE2E2E">Offline<';Normal = ' bgcolor="#58FA58">Normal<';PaperOut = ' bgcolor="#FC9704">TonerLow<';TonerLow = ' bgcolor="#FC9704">TonerLow<';NoToner = ' bgcolor="#FE2E2E">NoToner<';}
 
-# Site One Print Server
-$SiteOne = Get-Printer -ComputerName PSRV01 |
+# Southend Print Server
+$Util = Get-Printer -ComputerName Util |
 select @{Name="Printer Name";Expression={$_.Name}},
 @{Name="Location";Expression={$_.Location}},
 @{Name="Status";Expression={$_.PrinterStatus}},
 @{Name="Shared";Expression={$_.Shared}},
 @{Name="Published";Expression={$_.Published}} | 
 
-ConvertTo-Html -PreContent "<h2>Site One Printers</h2>" -Fragment
+ConvertTo-Html -PreContent "<h2>Util Printers</h2>" -Fragment
 
 # Cell Color - Find\Replace
-$StatusColor.Keys | foreach { $SiteOne  = $SiteOne  -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $Util = $Util -replace ">$_<",($StatusColor.$_) }
 
-# Site Two Print Server
-$SiteTwo = Get-Printer -ComputerName PSRV02 |
+# London Print Server
+$Util02 = Get-Printer -ComputerName Util02 |
 select @{Name="Printer Name";Expression={$_.Name}},
 @{Name="Location";Expression={$_.Location}},
 @{Name="Status";Expression={$_.PrinterStatus}},
 @{Name="Shared";Expression={$_.Shared}},
 @{Name="Published";Expression={$_.Published}} | 
 
-ConvertTo-Html -PreContent "<h2>Site Two Printers</h2>" -Fragment
+ConvertTo-Html -PreContent "<h2>Util02 Printers</h2>" -Fragment
 
 # Cell Color - Find\Replace
-$StatusColor.Keys | foreach { $SiteTwo = $SiteTwo -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $Util02 = $Util02 -replace ">$_<",($StatusColor.$_) }
 
 # Create final report
-ConvertTo-HTML -head $Style -PostContent "$SiteOne $SiteTwo" -PreContent '<h1>Printer Report</h1>'| Out-File "$ReportFileName"
+ConvertTo-HTML -head $Style -PostContent "$Util $Util02" -PreContent '<h1>Printer Report</h1>'| Out-File "$ReportFileName"
 
 # Email Report
 $Body = Get-Content -Raw $ReportFileName
