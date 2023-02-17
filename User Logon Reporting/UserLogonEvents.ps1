@@ -1,17 +1,22 @@
 <#
 User Logon Reporting Script
-J Pearman, April 2022, Version 1
+J Pearman, February 2023, Version 2
 
 Description:
 This script has been written to export a users logon, logoff, lock and unlock events for the purpose of creating a report showing these events.
 
 The following events are exported:
-    4624: User Logon (interactive only)
+    4624: User Logon (type 2: interactive)
+	4624: User Logon (type 11: cached interactive)
     4647: User Logoff
     4800: Computer Locked
     4801: Computer Unlocked
 
 Once exported these events are merged into a single CSV file where they can be viewed together.
+
+Version History:
+	Version 1 - Inital script
+	Version 2 - Added event 4624 type 11
 
 #>
 
@@ -22,7 +27,7 @@ $ResultPath = "C:\ResTmp\"
 
 New-Item -Path $ResultPath -ItemType Directory
 
-# Get Logon events
+# Get Type 2 Logon events
 
 $LogonEvents = Get-WinEvent -FilterHashtable @{LogName = 'Security'; ID = 4624; Data=2}
 
@@ -38,6 +43,23 @@ $Logons = foreach ($LogonEvent in $LogonEvents) {
     }
 
 $Logons | Export-Csv $ResultPath\LogonEvents.csv -NoTypeInformation
+
+# Get Type 11 Logon events
+
+$CacheLogonEvents = Get-WinEvent -FilterHashtable @{LogName = 'Security'; ID = 4624; Data=11}
+
+$CacheLogons = foreach ($CacheLogonEvent in $CacheLogonEvents) {
+    [pscustomobject]@{
+        ID = $CacheLogonEvent.Id
+        UserAccount = $CacheLogonEvent.Properties.Value[5]
+        UserDomain = $CacheLogonEvent.Properties.Value[6]
+        WorkstationName = $CacheLogonEvent.Properties.Value[11]
+        TimeCreated = $CacheLogonEvent.TimeCreated
+        Description = $CacheLogonEvent.TaskDisplayName
+        }
+    }
+
+$CacheLogons | Export-Csv $ResultPath\CacheLogonEvents.csv -NoTypeInformation
 
 # Get Logoff events
 
