@@ -35,33 +35,33 @@ $Style = "
 $StatusColor = @{False = ' bgcolor="#FE2E2E">False<';True = ' bgcolor="#58FA58">True<';Offline = ' bgcolor="#FE2E2E">Offline<';Error = ' bgcolor="#FE2E2E">Offline<';Normal = ' bgcolor="#58FA58">Normal<';PaperOut = ' bgcolor="#FC9704">TonerLow<';TonerLow = ' bgcolor="#FC9704">TonerLow<';NoToner = ' bgcolor="#FE2E2E">NoToner<';}
 
 # Southend Print Server
-$Util = Get-Printer -ComputerName Util |
+$prt1 = Get-Printer -ComputerName ps01 |
 select @{Name="Printer Name";Expression={$_.Name}},
 @{Name="Location";Expression={$_.Location}},
 @{Name="Status";Expression={$_.PrinterStatus}},
 @{Name="Shared";Expression={$_.Shared}},
 @{Name="Published";Expression={$_.Published}} | 
 
-ConvertTo-Html -PreContent "<h2>Util Printers</h2>" -Fragment
+ConvertTo-Html -PreContent "<h2>PS01 Printers</h2>" -Fragment
 
 # Cell Color - Find\Replace
-$StatusColor.Keys | foreach { $Util = $Util -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $PS01 = $PS01 -replace ">$_<",($StatusColor.$_) }
 
 # London Print Server
-$Util02 = Get-Printer -ComputerName Util02 |
+$prt2 = Get-Printer -ComputerName PS02 |
 select @{Name="Printer Name";Expression={$_.Name}},
 @{Name="Location";Expression={$_.Location}},
 @{Name="Status";Expression={$_.PrinterStatus}},
 @{Name="Shared";Expression={$_.Shared}},
 @{Name="Published";Expression={$_.Published}} | 
 
-ConvertTo-Html -PreContent "<h2>Util02 Printers</h2>" -Fragment
+ConvertTo-Html -PreContent "<h2>PS02 Printers</h2>" -Fragment
 
 # Cell Color - Find\Replace
-$StatusColor.Keys | foreach { $Util02 = $Util02 -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $PS02 = $PS02 -replace ">$_<",($StatusColor.$_) }
 
 # Create final report
-ConvertTo-HTML -head $Style -PostContent "$Util $Util02" -PreContent '<h1>Printer Report</h1>'| Out-File "$ReportFileName"
+ConvertTo-HTML -head $Style -PostContent "$prt1 $prt2" -PreContent '<h1>Printer Report</h1>'| Out-File "$ReportFileName"
 
 # Email Report
 $Body = Get-Content -Raw $ReportFileName
