@@ -13,12 +13,12 @@ Change Log:
 
 
 # Params
-$EmailTo  = "itlogs@irisib.com"
-$EmailFrom = "printers@irisib.com"
+$EmailTo  = "reportto@domain.com"
+$EmailFrom = "printers@domain.com"
 $EmailSubject = "Daily Printer Report"
-$SMTP = "192.168.5.225"
-$ReportFileName = "C:\TaskScripts\TaskOut\Printers\Printers.html"
-$Attachment = "C:\TaskScripts\TaskOut\Printers\Printers.html"
+$SMTP = "10.10.10.10"
+$ReportFileName = "C:\Task\Printers.html"
+$Attachment = "C:\Task\Printers.html"
 
 # HTML Table
 $Style = "
