@@ -7,7 +7,7 @@ This script has been written to export a users logon, logoff, lock and unlock ev
 
 The following events are exported:
     4624: User Logon (type 2: interactive)
-	4624: User Logon (type 11: cached interactive)
+    4624: User Logon (type 11: cached interactive)
     4647: User Logoff
     4800: Computer Locked
     4801: Computer Unlocked
