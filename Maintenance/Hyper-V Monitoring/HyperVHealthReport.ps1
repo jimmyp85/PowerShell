@@ -19,7 +19,7 @@ Version 3 - 		Added server uptime and last boot date
 # Parameters
 
 $EmailTo  = "jdoe@domainad.com"
-$EmailFrom = "host01@irisib.com"
+$EmailFrom = "host01@domain.com"
 $EmailSubject = "Hyper-V Daily Status Report for " + $ServerName
 $SMTP = "smtp.domain.com"
 $ServerName = $env:computername
