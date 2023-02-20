@@ -13,15 +13,15 @@ This is the initial version of a launcher for Brokasure created for users of bot
 
 # Brokasure Standard
 
-function BSLive{
+function BSUK{
     
     start-Process powershell -WorkingDirectory "\\SERVER\SHARE\BatFiles" {Start-Process BS.bat}
 
 }
 
-function BSFrance{
+function BSEU{
 
-    start-Process powershell -WorkingDirectory "\\SERVER\SHARE\BatFiles" {Start-Process France.bat}
+    start-Process powershell -WorkingDirectory "\\SERVER\SHARE\BatFiles" {Start-Process EU.bat}
 
 }
 
@@ -33,7 +33,7 @@ Add-Type -AssemblyName System.Drawing
 # Form Settings
 
 $main_form = New-Object System.Windows.Forms.Form
-$main_form.Text ='Iris Brokasure Launcher'
+$main_form.Text ='Company Brokasure Launcher'
 $Main_Form.Size = New-Object System.Drawing.Size(650,400)
 $main_form.StartPosition = "CenterScreen"
 #$main_form.BackgroundImageLayout = "Zoom"
@@ -42,9 +42,9 @@ $main_form.MaximizeBox = $True
 $main_form.WindowState = "Normal"
 $main_form.AutoSize = $false
 $main_form.BackColor = "WhiteSmoke"
-$main_form.BackgroundImage = [System.Drawing.Image]::FromFile("\\fs01.iris.local\brokasure\Launcher\Files\IrisTrans.png")
+$main_form.BackgroundImage = [System.Drawing.Image]::FromFile("\\FS.domain.com\Folder\Files\Trans.png")
 $main_form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::None;
-$Icon = New-Object system.drawing.icon ("\\fs01.iris.local\brokasure\Launcher\Files\logo.ico")
+$Icon = New-Object system.drawing.icon ("\\FS.domain.com\Folder\Files\Files\logo.ico")
 $main_form.Icon = $Icon
 
 # Title Settings
@@ -52,7 +52,7 @@ $main_form.Icon = $Icon
 $Label = New-Object System.Windows.Forms.Label
 $LabelFont = New-Object System.Drawing.Font("Calibri",24,[System.Drawing.FontStyle]::Bold)
 $Label.Font = $LabelFont
-$Label.Text = "Iris Brokasure launch Tool"
+$Label.Text = "Company Brokasure launch Tool"
 $Label.AutoSize = $True
 $Label.Location = New-Object System.Drawing.Size(215,40)
 $main_form.Controls.Add($Label)
@@ -68,37 +68,37 @@ $groupBox.Font = 'Calibri,10'
 $groupBox.text = "Brokasure Versions:"
 $main_form.Controls.Add($groupBox)
 
-# Iris Live Button 
+# Company Live Button 
 
 $BSLive = New-Object System.Windows.Forms.Button
 $BSLive.Location = New-Object System.Drawing.Size(15,30)
 $BSLive.Size = New-Object System.Drawing.Size(150,60)
 $BSLive.Font = 'Calibri,14'
-$BSLive.Text = "Iris UK"
+$BSLive.Text = "Company UK"
 $BSLive.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight;
 $BSLive.BackColor = "LightGray"
 $BSLive.Add_Click({BSLive})
 $BSLive.Cursor = [System.Windows.Forms.Cursors]::Hand
-$LiveImage = [System.Drawing.Image]::FromFile("\\fs01.iris.local\brokasure\Launcher\Files\UKButton.jpg")
+$LiveImage = [System.Drawing.Image]::FromFile("\\FS.domain.com\Folder\Files\Files\UKButton.jpg")
 $BSLive.Image = $LiveImage
 $BSLive.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft;
-$groupBox.Controls.Add($BSLive)
+$groupBox.Controls.Add($BSUK)
 
-# Iris France Button
+# Company EU Button
 
-$BSFrance = New-Object System.Windows.Forms.Button
-$BSFrance.Location = New-Object System.Drawing.Size(15,110)
-$BSFrance.Size = New-Object System.Drawing.Size(150,60)
-$BSFrance.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight;
-$BSFrance.Font = 'Calibri,14'
-$BSFrance.Text = "Iris France"
-$BSFrance.BackColor = "LightGray"
-$BSFrance.Add_Click({BSFrance})
-$BSFrance.Cursor = [System.Windows.Forms.Cursors]::Hand
-$FranceImage = [System.Drawing.Image]::FromFile("\\fs01.iris.local\brokasure\Launcher\Files\FrenchButton.png")
-$BSFrance.Image = $FranceImage
-$BSFrance.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft;
-$groupBox.Controls.Add($BSFrance)
+$BSEU = New-Object System.Windows.Forms.Button
+$BSEU.Location = New-Object System.Drawing.Size(15,110)
+$BSEU.Size = New-Object System.Drawing.Size(150,60)
+$BSEU.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight;
+$BSEU.Font = 'Calibri,14'
+$BSEU.Text = "Company EU"
+$BSEU.BackColor = "LightGray"
+$BSEU.Add_Click({BSEU})
+$BSEU.Cursor = [System.Windows.Forms.Cursors]::Hand
+$EUImage = [System.Drawing.Image]::FromFile("\\FS.domain.com\Folder\Files\EUButton.png")
+$$BSEU.Image = $EUImage
+$$BSEU.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft;
+$groupBox.Controls.Add($BSEU)
 
 # Cancel Button
 
@@ -110,7 +110,7 @@ $Cancel.Font = 'Calibri,14'
 $Cancel.Text = "Exit"
 $Cancel.BackColor = "LightGray"
 $Cancel.Cursor = [System.Windows.Forms.Cursors]::Hand
-$CancelImage = [System.Drawing.Image]::FromFile("\\fs01.iris.local\brokasure\Launcher\Files\ExitButtonTrans.png")
+$CancelImage = [System.Drawing.Image]::FromFile("\\FS.domain.com\Folder\Files\ExitButtonTrans.png")
 $Cancel.Image = $CancelImage
 $Cancel.ImageAlign = [System.Drawing.ContentAlignment]::MiddleLeft;
 $groupBox.Controls.Add($Cancel)
@@ -131,7 +131,7 @@ $outputBox.Size = New-Object System.Drawing.Size(400,200)
 $outputBox.Font = New-Object System.Drawing.Font("Calibri", 14 ,[System.Drawing.FontStyle]::Regular)
 $outputBox.MultiLine = $True
 $outputBox.ScrollBars = "Vertical"
-$outputBox.Text = "Welcome to the Iris Brokasure Launcher.` 
+$outputBox.Text = "Welcome to the Brokasure Launcher.` 
 
 Select the version of Brokasure you wish to use or press Exit to leave."
 $main_form.Controls.Add($outputBox)
