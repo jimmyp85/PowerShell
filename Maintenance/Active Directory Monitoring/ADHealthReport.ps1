@@ -1,6 +1,6 @@
 <#
-Active Directory Health Report - Version 2
-J Pearman, January 2022
+Active Directory Health Report - Version 3
+J Pearman, July 2024
 
 Description:
 This script has been written to be run as a scheduled task and create a basic health report on domain controllers and active directory. Once generated the report is then emailed.
@@ -8,23 +8,22 @@ This script has been written to be run as a scheduled task and create a basic he
 This script has been written for two AD sites but more can be added.
 
 Change Log:
-Version 1: Initial version
-Version 2: Changed section header size 
-           Added colours for pass/fail/true/false to make it easier to read at a glance
-           Changed HTML table
+Version 1: 	- Initial version
+Version 2: 	- Changed section header size 
+			- Added colours for pass/fail/true/false to make it easier to read at a glance
+			- Changed HTML table
+Version 3: 	- Fixed bug with running DCDIAG function as Invoke-Command and ScriptBlock
 
 #>
 
-# Params
-
-$SiteOne = Get-ADDomainController -Discover -Site [SITE NAME] | Select Name
-$SiteTwo = Get-ADDomainController -Discover -Site [SITE NAME] | Select Name
-$EmailTo  = "jdoe@domain.com"
+$SiteOne = Get-ADDomainController -Discover -Site SiteOne | foreach { $_.Name }
+$SiteTwo = Get-ADDomainController -Discover -Site SiteTwo | foreach { $_.Name }
+$EmailTo  = "recipient@domain.com"
 $EmailFrom = "adreport@domain.com"
 $EmailSubject = "Active Directory Health Report"
-$SMTP = "smtp.domain.com"
-$ReportFileName = "C:\Scripts\ADReport.html"
-$Attachment = "C:\Scripts\ADReport.html"
+$SMTP = "mail.domain.com"
+$ReportFileName = "C:\AD_Health\ADReport.html"
+$Attachment = "C:\AD_Health\ADReport.html"
 
 # Functions
 
@@ -43,9 +42,9 @@ function Get-DcDiag {
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [string]$DomainController
-        )
+    )
 
-    $result = dcdiag /s:$DomainController
+    $result = dcdiag /skip:Services /s:$DomainController
     $result | select-string -pattern '\. (.*) \b(passed|failed)\b test (.*)' | foreach {
         $obj = @{
             TestName = $_.Matches.Groups[3].Value
@@ -54,6 +53,7 @@ function Get-DcDiag {
         }
         [pscustomobject]$obj
     }
+    
 }
 
 # HTML Table
@@ -71,13 +71,12 @@ $Table = @"
 "@
 
 #Cell Color - Logic
-
 $StatusColor = @{False = ' bgcolor="#FE2E2E">False<';True = ' bgcolor="#58FA58">True<';Stopped = ' bgcolor="#FE2E2E">Stopped<';Running = ' bgcolor="#58FA58">Running<';Failed = ' bgcolor="#FE2E2E">Failed<';Passed = ' bgcolor="#58FA58">Passed<';}
 
 # DC Connectivity Tests
 
-$SiteOneNetTest = Test-NetConnection -ComputerName $SiteOne.Name | Select-Object *
-$SiteTwoNetTest = Test-NetConnection -ComputerName $SiteTwo.Name | Select-Object *
+$SiteOneNetTest = Test-NetConnection -ComputerName $SiteOne | Select-Object *
+$SiteTwoNetTest = Test-NetConnection -ComputerName $SiteTwo | Select-Object *
 
 
 $NetResults = $SiteOneNetTest, $SiteTwoNetTest |
@@ -93,45 +92,45 @@ $StatusColor.Keys | foreach { $SiteTwoNetTest = $SiteTwoNetTest -replace ">$_<",
     
     # Services
 
-$SiteOneServices = Invoke-Command -ComputerName $SiteOne.Name -ScriptBlock ${function:Get-ADServices} | Select-Object Name, DisplayName, Status | 
-ConvertTo-Html -PreContent "<h2>Site One DC Services</h2>" -Fragment
+$SouthendServices = Invoke-Command -ComputerName $SiteOne -ScriptBlock ${function:Get-ADServices} | Select-Object Name, DisplayName, Status | 
+ConvertTo-Html -PreContent "<h2>Southend Services</h2>" -Fragment
 
     # Cell Color - Find\Replace
 
-$StatusColor.Keys | foreach { $SiteOneServices = $SiteOneServices -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $SouthendServices = $SouthendServices -replace ">$_<",($StatusColor.$_) }
 
     # Diags
 
-$SiteOneDiags = Invoke-Command -ComputerName $SiteOne.Name -ScriptBlock ${function:Get-DcDiag} -ArgumentList $SiteOne.Name | Select-Object TestName, TestResult, Entity | 
-ConvertTo-Html -PreContent "<h2>Site One DC DIAG</h2>" -Fragment | Out-String
+$SouthDiags = Get-DcDiag -DomainController $SiteOne | Select-Object TestName, TestResult, Entity | 
+ConvertTo-Html -PreContent "<h2>Southend DC DIAG</h2>" -Fragment | Out-String
 
     # Cell Color - Find\Replace
 
-$StatusColor.Keys | foreach { $SiteOneDiags = $SiteOneDiags -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $SouthDiags = $SouthDiags -replace ">$_<",($StatusColor.$_) }
 
 # Site Two Tests
 
     # Services
 
-$SiteTwoServices = Invoke-Command -ComputerName $SiteTwo.Name -ScriptBlock ${function:Get-ADServices} | Select-Object Name, DisplayName, Status | 
-ConvertTo-Html -PreContent "<h2>Site Two Services</h2>" -Fragment
+$LondonServices = Invoke-Command -ComputerName $SiteTwo -ScriptBlock ${function:Get-ADServices} | Select-Object Name, DisplayName, Status | 
+ConvertTo-Html -PreContent "<h2>London Services</h2>" -Fragment
 
     # Cell Color - Find\Replace
 
-$StatusColor.Keys | foreach { $SiteTwoServices = $SiteTwoServices -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $LondonServices = $LondonServices -replace ">$_<",($StatusColor.$_) }
 
     # Diags
 
-$SiteTwoDiags = Invoke-Command -ComputerName $SiteTwo.Name -ScriptBlock ${function:Get-DcDiag} -ArgumentList $SiteTwo.Name | Select-Object TestName, TestResult, Entity | 
-ConvertTo-Html -PreContent "<h2>Site Two DC DIAG</h2>" -Fragment | Out-String
+$LondonDiags = Get-DcDiag -DomainController $SiteTwo | Select-Object TestName, TestResult, Entity | 
+ConvertTo-Html -PreContent "<h2>London DC DIAG</h2>" -Fragment | Out-String
 
     # Cell Color - Find\Replace
 
-$StatusColor.Keys | foreach { $SiteTwoDiags = $SiteTwoDiags -replace ">$_<",($StatusColor.$_) }
+$StatusColor.Keys | foreach { $LondonDiags = $LondonDiags -replace ">$_<",($StatusColor.$_) }
 
 # Report Build
 
-ConvertTo-Html -PreContent '<h1>AD Health Report</h1>' -PostContent "$NetResults $SiteOneServices $SiteOneDiags $SiteTwoServices $SiteTwoDiags" -Head $Table -Title "AD Health Report" | Out-File $ReportFileName
+ConvertTo-Html -PreContent '<h1>AD Health Report</h1>' -PostContent "$NetResults $SouthendServices $SouthDiags $LondonServices $LondonDiags" -Head $Table -Title "AD Health Report" | Out-File $ReportFileName
 
 # Email Report
 
