@@ -1,5 +1,5 @@
 # Active Directory Monitoring Script
-J Pearman, Version 2, January 2022
+J Pearman, Version 3, July 2024
 
 ## Purpose
 This script has been written to run as a scheduled take and report daily on the general health of your domain controllers.
@@ -54,6 +54,7 @@ Version 1: Initial version
 Version 2: Changed section header size 
            Added colours for pass/fail/true/false to make it easier to read at a glance
            Changed HTML table
+Version 3: Fixed bug with running DCDIAG function as Invoke-Command and ScriptBlock
 
 ##  Parameters to Change
 The following parameters need to be changed in the script:
